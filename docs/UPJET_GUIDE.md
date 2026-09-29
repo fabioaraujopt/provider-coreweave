@@ -180,10 +180,11 @@ import and delete.
 
 ## 9. Bumping the CoreWeave provider
 
-1. In the fork: rebase `crossplane` onto the new upstream tag and tag
-   `v<new>-xp.1` (see `CROSSPLANE_FORK.md`).
-2. Here: update the `replace` line and `TERRAFORM_PROVIDER_VERSION`, then
-   `go mod tidy && make generate`.
+1. In the fork: rebase `crossplane` onto the new upstream tag and push it
+   (see `CROSSPLANE_FORK.md`).
+2. Here: point the `replace` line at the new commit with
+   `go mod edit -replace github.com/coreweave/terraform-provider-coreweave=github.com/fabioaraujopt/terraform-provider-coreweave@<commit>`,
+   bump `TERRAFORM_PROVIDER_VERSION`, then `go mod tidy && make generate`.
 3. New resources won't appear until you add them to `ExternalNameConfigs`.
    `config/schema.json` shows what's new.
 4. `make crddiff` in CI flags breaking API changes.
