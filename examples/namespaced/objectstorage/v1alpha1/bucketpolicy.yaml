@@ -1,0 +1,29 @@
+apiVersion: objectstorage.coreweave.m.crossplane.io/v1alpha1
+kind: BucketPolicy
+metadata:
+  name: example
+  namespace: default
+spec:
+  forProvider:
+    bucketSelector:
+      matchLabels:
+        testing.upbound.io/example-name: bucket
+    policy: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "allow-org",
+            "Effect": "Allow",
+            "Principal": {"CW": "*"},
+            "Action": ["s3:GetObject", "s3:ListBucket"],
+            "Resource": [
+              "arn:aws:s3:::crossplane-example-bucket-change-me",
+              "arn:aws:s3:::crossplane-example-bucket-change-me/*"
+            ]
+          }
+        ]
+      }
+  providerConfigRef:
+    kind: ClusterProviderConfig
+    name: default

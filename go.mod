@@ -5,6 +5,7 @@ go 1.26.7
 tool golang.org/x/tools/cmd/goimports
 
 require (
+	github.com/coreweave/terraform-provider-coreweave v0.24.0
 	dario.cat/mergo v1.0.2
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/crossplane/crossplane-runtime/v2 v2.5.0-rc.0.0.20260908074656-9b2fb6b1d1ff
@@ -159,3 +160,8 @@ require (
 	sigs.k8s.io/structured-merge-diff/v6 v6.4.2 // indirect
 	sigs.k8s.io/yaml v1.6.0 // indirect
 )
+
+// CoreWeave's Terraform provider keeps its provider in internal/, which other
+// modules cannot import. The fork only adds a public xpprovider package on top
+// of each upstream release (see CROSSPLANE_FORK.md in the fork).
+replace github.com/coreweave/terraform-provider-coreweave => github.com/your-org/terraform-provider-coreweave v0.24.0-xp.1

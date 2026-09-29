@@ -1,0 +1,18 @@
+apiVersion: inference.coreweave.m.crossplane.io/v1alpha1
+kind: Gateway
+metadata:
+  name: example
+  namespace: default
+spec:
+  forProvider:
+    name: crossplane-example
+    zones:
+      - US-EAST-04A
+    auth:
+      coreweave: {}
+    routing:
+      bodyBased:
+        apiType: API_TYPE_OPENAI
+  providerConfigRef:
+    kind: ClusterProviderConfig
+    name: default

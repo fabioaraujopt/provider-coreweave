@@ -1,0 +1,17 @@
+apiVersion: objectstorage.coreweave.m.crossplane.io/v1alpha1
+kind: Bucket
+metadata:
+  # metadata.name (or the crossplane.io/external-name annotation) is the
+  # bucket name. Bucket names are global, so pick something unique.
+  name: crossplane-example-bucket-change-me
+  namespace: default
+  labels:
+    testing.upbound.io/example-name: bucket
+spec:
+  forProvider:
+    zone: US-EAST-04A
+    tags:
+      managed-by: crossplane
+  providerConfigRef:
+    kind: ClusterProviderConfig
+    name: default

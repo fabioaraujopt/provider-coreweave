@@ -1,0 +1,25 @@
+apiVersion: cks.coreweave.crossplane.io/v1alpha1
+kind: Cluster
+metadata:
+  name: example
+  annotations:
+    # Cluster creation takes a while; give uptest room.
+    uptest.upbound.io/timeout: "3600"
+spec:
+  forProvider:
+    name: crossplane-example
+    version: v1.35
+    zone: US-EAST-04A
+    public: false
+    # Resolved to the VPC's API-assigned ID.
+    vpcIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: vpc
+    podCidrName: pod cidr
+    serviceCidrName: service cidr
+    internalLbCidrNames:
+      - internal lb cidr
+  # The cluster's API server endpoint and OIDC issuer URL are in
+  # status.atProvider.
+  providerConfigRef:
+    name: default

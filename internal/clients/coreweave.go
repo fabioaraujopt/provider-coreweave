@@ -11,6 +11,8 @@ import (
 
 	"github.com/crossplane/upjet/v2/pkg/terraform"
 
+	"github.com/coreweave/terraform-provider-coreweave/xpprovider"
+
 	clusterv1beta1 "github.com/your-org/provider-coreweave/apis/cluster/v1beta1"
 	namespacedv1beta1 "github.com/your-org/provider-coreweave/apis/namespaced/v1beta1"
 )
@@ -22,6 +24,16 @@ const (
 	errTrackUsage           = "cannot track ProviderConfig usage"
 	errExtractCredentials   = "cannot extract credentials"
 	errUnmarshalCredentials = "cannot unmarshal coreweave credentials as JSON"
+	errNoToken              = "coreweave credentials must contain a non-empty \"token\""
+)
+
+// Keys accepted in the ProviderConfig credentials JSON. They map 1:1 to the
+// CoreWeave Terraform provider configuration block.
+const (
+	keyToken       = "token"        // required, CW-SECRET-...
+	keyEndpoint    = "endpoint"     // optional, defaults to https://api.coreweave.com/
+	keyS3Endpoint  = "s3_endpoint"  // optional, defaults to https://cwobject.com (use http://cwlota.com in-cluster)
+	keyHTTPTimeout = "http_timeout" // optional, e.g. "30s"
 )
 
 // TerraformSetupBuilder builds Terraform a terraform.SetupFn function which
@@ -50,11 +62,20 @@ func TerraformSetupBuilder(version, providerSource, providerVersion string) terr
 			return ps, errors.Wrap(err, errUnmarshalCredentials)
 		}
 
-		// Set credentials in Terraform provider configuration.
-		/*ps.Configuration = map[string]any{
-			"username": creds["username"],
-			"password": creds["password"],
-		}*/
+		if creds[keyToken] == "" {
+			return ps, errors.New(errNoToken)
+		}
+		ps.Configuration = map[string]any{keyToken: creds[keyToken]}
+		for _, k := range []string{keyEndpoint, keyS3Endpoint, keyHTTPTimeout} {
+			if v := creds[k]; v != "" {
+				ps.Configuration[k] = v
+			}
+		}
+
+		// All resources are Terraform Plugin Framework resources reconciled
+		// in-process. Upjet calls ConfigureProvider on this instance with
+		// ps.Configuration, so each ProviderConfig gets its own client.
+		ps.FrameworkProvider = xpprovider.New(providerVersion)
 		return ps, nil
 	}
 }

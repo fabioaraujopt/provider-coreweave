@@ -180,6 +180,11 @@ func main() {
 	metrics.Registry.MustRegister(metricRecorder)
 	metrics.Registry.MustRegister(stateMetrics)
 
+	// All CoreWeave resources are Terraform Plugin Framework resources that
+	// run in-process (no-fork). Their controllers keep in-flight state in the
+	// operation tracker store instead of Terraform workspaces on disk.
+	opTrackerStore := tjcontroller.NewOperationStore(log)
+
 	clusterOpts := tjcontroller.Options{
 		Options: xpcontroller.Options{
 			Logger:                  log,
@@ -193,12 +198,11 @@ func main() {
 				MRStateMetrics:          stateMetrics,
 			},
 		},
-		Provider: config.GetProvider(),
-		// use the following WorkspaceStoreOption to enable the shared gRPC mode
-		// terraform.WithProviderRunner(terraform.NewSharedProvider(log, os.Getenv("TERRAFORM_NATIVE_PROVIDER_PATH"), terraform.WithNativeProviderArgs("-debuggable")))
-		WorkspaceStore: terraform.NewWorkspaceStore(log),
-		SetupFn:        clients.TerraformSetupBuilder(*terraformVersion, *providerSource, *providerVersion),
-		StartWebhooks:  *certsDir != "",
+		Provider:              config.GetProvider(),
+		OperationTrackerStore: opTrackerStore,
+		WorkspaceStore:        terraform.NewWorkspaceStore(log),
+		SetupFn:               clients.TerraformSetupBuilder(*terraformVersion, *providerSource, *providerVersion),
+		StartWebhooks:         *certsDir != "",
 	}
 
 	namespacedOpts := tjcontroller.Options{
@@ -214,12 +218,11 @@ func main() {
 				MRStateMetrics:          stateMetrics,
 			},
 		},
-		Provider: config.GetProviderNamespaced(),
-		// use the following WorkspaceStoreOption to enable the shared gRPC mode
-		// terraform.WithProviderRunner(terraform.NewSharedProvider(log, os.Getenv("TERRAFORM_NATIVE_PROVIDER_PATH"), terraform.WithNativeProviderArgs("-debuggable")))
-		WorkspaceStore: terraform.NewWorkspaceStore(log),
-		SetupFn:        clients.TerraformSetupBuilder(*terraformVersion, *providerSource, *providerVersion),
-		StartWebhooks:  *certsDir != "",
+		Provider:              config.GetProviderNamespaced(),
+		OperationTrackerStore: opTrackerStore,
+		WorkspaceStore:        terraform.NewWorkspaceStore(log),
+		SetupFn:               clients.TerraformSetupBuilder(*terraformVersion, *providerSource, *providerVersion),
+		StartWebhooks:         *certsDir != "",
 	}
 
 	if *enableManagementPolicies {

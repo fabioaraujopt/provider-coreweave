@@ -6,8 +6,14 @@ import (
 
 	ujconfig "github.com/crossplane/upjet/v2/pkg/config"
 
-	nullCluster "github.com/your-org/provider-coreweave/config/cluster/null"
-	nullNamespaced "github.com/your-org/provider-coreweave/config/namespaced/null"
+	"github.com/coreweave/terraform-provider-coreweave/xpprovider"
+
+	"github.com/your-org/provider-coreweave/config/cks"
+	"github.com/your-org/provider-coreweave/config/inference"
+	"github.com/your-org/provider-coreweave/config/networking"
+	"github.com/your-org/provider-coreweave/config/objectstorage"
+	"github.com/your-org/provider-coreweave/config/sandbox"
+	"github.com/your-org/provider-coreweave/config/workloadfederation"
 )
 
 const (
@@ -21,47 +27,58 @@ var providerSchema string
 //go:embed provider-metadata.yaml
 var providerMetadata string
 
-// GetProvider returns provider configuration
+// configurators are shared by the cluster-scoped and namespaced providers.
+// References use TerraformName, so the same configuration resolves to the
+// right API package in both scopes.
+var configurators = []func(provider *ujconfig.Provider){
+	cks.Configure,
+	networking.Configure,
+	objectstorage.Configure,
+	inference.Configure,
+	sandbox.Configure,
+	workloadfederation.Configure,
+}
+
+// GetProvider returns the cluster-scoped provider configuration
+// (*.coreweave.crossplane.io, Crossplane v1-style managed resources).
 func GetProvider() *ujconfig.Provider {
-	pc := ujconfig.NewProvider([]byte(providerSchema), resourcePrefix, modulePath, []byte(providerMetadata),
-		ujconfig.WithRootGroup("coreweave.crossplane.io"),
-		ujconfig.WithIncludeList(ExternalNameConfigured()),
-		ujconfig.WithFeaturesPackage("internal/features"),
-		ujconfig.WithDefaultResourceOptions(
-			ExternalNameConfigurations(),
-		))
-
-	for _, configure := range []func(provider *ujconfig.Provider){
-		// add custom config functions
-		nullCluster.Configure,
-	} {
-		configure(pc)
-	}
-
-	pc.ConfigureResources()
-	return pc
+	return newProvider("coreweave.crossplane.io")
 }
 
 // GetProviderNamespaced returns the namespaced provider configuration
+// (*.coreweave.m.crossplane.io, Crossplane v2 managed resources).
 func GetProviderNamespaced() *ujconfig.Provider {
-	pc := ujconfig.NewProvider([]byte(providerSchema), resourcePrefix, modulePath, []byte(providerMetadata),
-		ujconfig.WithRootGroup("coreweave.m.crossplane.io"),
-		ujconfig.WithIncludeList(ExternalNameConfigured()),
-		ujconfig.WithFeaturesPackage("internal/features"),
-		ujconfig.WithDefaultResourceOptions(
-			ExternalNameConfigurations(),
-		),
+	return newProvider("coreweave.m.crossplane.io",
 		ujconfig.WithExampleManifestConfiguration(ujconfig.ExampleManifestConfiguration{
 			ManagedResourceNamespace: "crossplane-system",
 		}))
+}
 
-	for _, configure := range []func(provider *ujconfig.Provider){
-		// add custom config functions
-		nullNamespaced.Configure,
-	} {
+func newProvider(rootGroup string, extra ...ujconfig.ProviderOption) *ujconfig.Provider {
+	opts := append([]ujconfig.ProviderOption{
+		ujconfig.WithRootGroup(rootGroup),
+		ujconfig.WithShortName("coreweave"),
+		// Every CoreWeave resource is built on the Terraform Plugin Framework,
+		// so all of them are reconciled in-process through the framework
+		// provider (Upjet "no-fork" architecture): no Terraform CLI, no
+		// provider binary, no workspace on disk.
+		ujconfig.WithIncludeList([]string{}),
+		ujconfig.WithTerraformPluginFrameworkIncludeList(ExternalNameConfigured()),
+		ujconfig.WithTerraformPluginFrameworkProvider(xpprovider.New("")),
+		ujconfig.WithFeaturesPackage("internal/features"),
+		// Render Terraform blocks with MaxItems=1 as embedded objects rather
+		// than single-element lists (the current Upjet default for new
+		// providers; avoids a breaking API change later).
+		ujconfig.WithSchemaTraversers(&ujconfig.SingletonListEmbedder{}),
+		ujconfig.WithDefaultResourceOptions(
+			ExternalNameConfigurations(),
+		),
+	}, extra...)
+
+	pc := ujconfig.NewProvider([]byte(providerSchema), resourcePrefix, modulePath, []byte(providerMetadata), opts...)
+	for _, configure := range configurators {
 		configure(pc)
 	}
-
 	pc.ConfigureResources()
 	return pc
 }

@@ -1,0 +1,24 @@
+apiVersion: networking.coreweave.crossplane.io/v1alpha1
+kind: VPC
+metadata:
+  name: example
+  labels:
+    testing.upbound.io/example-name: vpc
+spec:
+  forProvider:
+    name: crossplane-example
+    zone: US-EAST-04A
+    hostPrefixes:
+      - name: primary
+        type: PRIMARY
+        prefixes:
+          - 10.16.192.0/18
+    vpcPrefixes:
+      - name: pod cidr
+        value: 10.0.0.0/13
+      - name: service cidr
+        value: 10.16.0.0/22
+      - name: internal lb cidr
+        value: 10.32.4.0/22
+  providerConfigRef:
+    name: default

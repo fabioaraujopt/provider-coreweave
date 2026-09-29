@@ -1,0 +1,16 @@
+apiVersion: objectstorage.coreweave.crossplane.io/v1alpha1
+kind: AccessKey
+metadata:
+  name: example
+spec:
+  forProvider:
+    # 0 = permanent key; a positive number of seconds makes it expire.
+    durationSeconds: 0
+    attributes:
+      application: crossplane-example
+  # access_key_id and secret_access_key land in this Secret.
+  writeConnectionSecretToRef:
+    name: example-object-storage-key
+    namespace: crossplane-system
+  providerConfigRef:
+    name: default

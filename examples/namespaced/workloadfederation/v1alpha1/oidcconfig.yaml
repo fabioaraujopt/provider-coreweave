@@ -1,0 +1,14 @@
+apiVersion: workloadfederation.coreweave.m.crossplane.io/v1alpha1
+kind: OIDCConfig
+metadata:
+  name: example
+  namespace: default
+spec:
+  forProvider:
+    name: crossplane-example
+    description: Example workload identity federation
+    issuerUrl: https://token.actions.githubusercontent.com
+    audience: https://coreweave.com/iam
+  providerConfigRef:
+    kind: ClusterProviderConfig
+    name: default

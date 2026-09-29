@@ -1,0 +1,13 @@
+apiVersion: objectstorage.coreweave.crossplane.io/v1alpha1
+kind: BucketVersioning
+metadata:
+  name: example
+spec:
+  forProvider:
+    bucketSelector:
+      matchLabels:
+        testing.upbound.io/example-name: bucket
+    versioningConfiguration:
+      status: Enabled
+  providerConfigRef:
+    name: default
