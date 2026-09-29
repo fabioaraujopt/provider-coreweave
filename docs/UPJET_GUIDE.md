@@ -37,7 +37,7 @@ reconciles, and a tiny image. Upbound's AWS/Azure/GCP providers use it.
 ideal for no-fork. But its provider constructor lives in `internal/provider`,
 and Go forbids importing `internal/` from another module.
 
-The fork (branch `crossplane`, tag `v0.24.0-xp.1`) adds exactly one file:
+The fork (branch `crossplane` on `fabioaraujopt/terraform-provider-coreweave`) adds exactly one file:
 
 ```go
 // xpprovider/xpprovider.go
@@ -52,7 +52,7 @@ This is the same pattern Upbound uses (`xpprovider` packages in their AWS and
 Azure forks). `provider-coreweave/go.mod` points at it with:
 
 ```
-replace github.com/coreweave/terraform-provider-coreweave => github.com/your-org/terraform-provider-coreweave v0.24.0-xp.1
+replace github.com/coreweave/terraform-provider-coreweave => github.com/fabioaraujopt/terraform-provider-coreweave v0.0.0-20260929201703-720e39f70417
 ```
 
 Worth proposing upstream to CoreWeave: if they accept a public `xpprovider`
@@ -63,7 +63,7 @@ package, the fork goes away.
 ```bash
 # "Use this template" on crossplane/upjet-provider-template, then:
 PROVIDER_NAME_LOWER=coreweave PROVIDER_NAME_NORMAL=CoreWeave \
-ORGANIZATION_NAME=your-org CRD_ROOT_GROUP=crossplane.io ./hack/prepare.sh
+ORGANIZATION_NAME=fabioaraujopt CRD_ROOT_GROUP=crossplane.io ./hack/prepare.sh
 ```
 
 Then in the `Makefile`:

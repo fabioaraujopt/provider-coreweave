@@ -13,8 +13,8 @@ import (
 
 	"github.com/coreweave/terraform-provider-coreweave/xpprovider"
 
-	clusterv1beta1 "github.com/your-org/provider-coreweave/apis/cluster/v1beta1"
-	namespacedv1beta1 "github.com/your-org/provider-coreweave/apis/namespaced/v1beta1"
+	clusterv1beta1 "github.com/fabioaraujopt/provider-coreweave/apis/cluster/v1beta1"
+	namespacedv1beta1 "github.com/fabioaraujopt/provider-coreweave/apis/namespaced/v1beta1"
 )
 
 const (

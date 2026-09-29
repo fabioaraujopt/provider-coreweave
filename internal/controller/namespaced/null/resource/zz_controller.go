@@ -21,8 +21,8 @@ import (
 	"github.com/pkg/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	v1alpha1 "github.com/your-org/provider-coreweave/apis/namespaced/null/v1alpha1"
-	features "github.com/your-org/provider-coreweave/internal/features"
+	v1alpha1 "github.com/fabioaraujopt/provider-coreweave/apis/namespaced/null/v1alpha1"
+	features "github.com/fabioaraujopt/provider-coreweave/internal/features"
 )
 
 // SetupWebhookWithManager registers the conversion webhook for Resource.

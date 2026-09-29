@@ -7,7 +7,7 @@ import (
 
 	"github.com/crossplane/upjet/v2/pkg/pipeline"
 
-	"github.com/your-org/provider-coreweave/config"
+	"github.com/fabioaraujopt/provider-coreweave/config"
 )
 
 func main() {

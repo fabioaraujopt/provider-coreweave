@@ -8,17 +8,17 @@ import (
 
 	"github.com/coreweave/terraform-provider-coreweave/xpprovider"
 
-	"github.com/your-org/provider-coreweave/config/cks"
-	"github.com/your-org/provider-coreweave/config/inference"
-	"github.com/your-org/provider-coreweave/config/networking"
-	"github.com/your-org/provider-coreweave/config/objectstorage"
-	"github.com/your-org/provider-coreweave/config/sandbox"
-	"github.com/your-org/provider-coreweave/config/workloadfederation"
+	"github.com/fabioaraujopt/provider-coreweave/config/cks"
+	"github.com/fabioaraujopt/provider-coreweave/config/inference"
+	"github.com/fabioaraujopt/provider-coreweave/config/networking"
+	"github.com/fabioaraujopt/provider-coreweave/config/objectstorage"
+	"github.com/fabioaraujopt/provider-coreweave/config/sandbox"
+	"github.com/fabioaraujopt/provider-coreweave/config/workloadfederation"
 )
 
 const (
 	resourcePrefix = "coreweave"
-	modulePath     = "github.com/your-org/provider-coreweave"
+	modulePath     = "github.com/fabioaraujopt/provider-coreweave"
 )
 
 //go:embed schema.json

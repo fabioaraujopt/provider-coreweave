@@ -8,7 +8,7 @@ import (
 	"github.com/crossplane/upjet/v2/pkg/controller"
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	"github.com/your-org/provider-coreweave/apis/cluster/v1beta1"
+	"github.com/fabioaraujopt/provider-coreweave/apis/cluster/v1beta1"
 )
 
 // SetupWebhookWithManager registers the conversion webhook for ProviderConfig.

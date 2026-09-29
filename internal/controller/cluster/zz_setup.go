@@ -9,8 +9,8 @@ import (
 
 	"github.com/crossplane/upjet/v2/pkg/controller"
 
-	resource "github.com/your-org/provider-coreweave/internal/controller/cluster/null/resource"
-	providerconfig "github.com/your-org/provider-coreweave/internal/controller/cluster/providerconfig"
+	resource "github.com/fabioaraujopt/provider-coreweave/internal/controller/cluster/null/resource"
+	providerconfig "github.com/fabioaraujopt/provider-coreweave/internal/controller/cluster/providerconfig"
 )
 
 // Setup creates all controllers with the supplied logger and adds them to

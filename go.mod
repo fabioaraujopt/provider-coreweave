@@ -1,4 +1,4 @@
-module github.com/your-org/provider-coreweave
+module github.com/fabioaraujopt/provider-coreweave
 
 go 1.26.7
 
@@ -164,4 +164,4 @@ require (
 // CoreWeave's Terraform provider keeps its provider in internal/, which other
 // modules cannot import. The fork only adds a public xpprovider package on top
 // of each upstream release (see CROSSPLANE_FORK.md in the fork).
-replace github.com/coreweave/terraform-provider-coreweave => github.com/your-org/terraform-provider-coreweave v0.24.0-xp.1
+replace github.com/coreweave/terraform-provider-coreweave => github.com/fabioaraujopt/terraform-provider-coreweave v0.0.0-20260929201703-720e39f70417

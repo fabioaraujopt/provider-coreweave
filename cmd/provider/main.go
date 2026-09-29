@@ -39,14 +39,14 @@ import (
 
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 
-	apisCluster "github.com/your-org/provider-coreweave/apis/cluster"
-	apisNamespaced "github.com/your-org/provider-coreweave/apis/namespaced"
-	"github.com/your-org/provider-coreweave/config"
-	"github.com/your-org/provider-coreweave/internal/clients"
-	controllerCluster "github.com/your-org/provider-coreweave/internal/controller/cluster"
-	controllerNamespaced "github.com/your-org/provider-coreweave/internal/controller/namespaced"
-	"github.com/your-org/provider-coreweave/internal/features"
-	"github.com/your-org/provider-coreweave/internal/version"
+	apisCluster "github.com/fabioaraujopt/provider-coreweave/apis/cluster"
+	apisNamespaced "github.com/fabioaraujopt/provider-coreweave/apis/namespaced"
+	"github.com/fabioaraujopt/provider-coreweave/config"
+	"github.com/fabioaraujopt/provider-coreweave/internal/clients"
+	controllerCluster "github.com/fabioaraujopt/provider-coreweave/internal/controller/cluster"
+	controllerNamespaced "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced"
+	"github.com/fabioaraujopt/provider-coreweave/internal/features"
+	"github.com/fabioaraujopt/provider-coreweave/internal/version"
 )
 
 const (

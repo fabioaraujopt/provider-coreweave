@@ -2,7 +2,7 @@
 # Setup Project
 
 PROJECT_NAME ?= provider-coreweave
-PROJECT_REPO ?= github.com/your-org/$(PROJECT_NAME)
+PROJECT_REPO ?= github.com/fabioaraujopt/$(PROJECT_NAME)
 
 export TERRAFORM_VERSION ?= 1.5.7
 
