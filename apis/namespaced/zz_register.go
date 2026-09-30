@@ -10,17 +10,27 @@ package namespaced
 import (
 	"k8s.io/apimachinery/pkg/runtime"
 
-	v1alpha1 "github.com/fabioaraujopt/provider-coreweave/apis/namespaced/null/v1alpha1"
+	v1alpha1 "github.com/fabioaraujopt/provider-coreweave/apis/namespaced/cks/v1alpha1"
+	v1alpha1inference "github.com/fabioaraujopt/provider-coreweave/apis/namespaced/inference/v1alpha1"
+	v1alpha1networking "github.com/fabioaraujopt/provider-coreweave/apis/namespaced/networking/v1alpha1"
+	v1alpha1objectstorage "github.com/fabioaraujopt/provider-coreweave/apis/namespaced/objectstorage/v1alpha1"
+	v1alpha1sandbox "github.com/fabioaraujopt/provider-coreweave/apis/namespaced/sandbox/v1alpha1"
 	v1alpha1namespaced "github.com/fabioaraujopt/provider-coreweave/apis/namespaced/v1alpha1"
 	v1beta1 "github.com/fabioaraujopt/provider-coreweave/apis/namespaced/v1beta1"
+	v1alpha1workloadfederation "github.com/fabioaraujopt/provider-coreweave/apis/namespaced/workloadfederation/v1alpha1"
 )
 
 func init() {
 	// Register the types with the Scheme so the components can map objects to GroupVersionKinds and back
 	AddToSchemes = append(AddToSchemes,
 		v1alpha1.SchemeBuilder.AddToScheme,
+		v1alpha1inference.SchemeBuilder.AddToScheme,
+		v1alpha1networking.SchemeBuilder.AddToScheme,
+		v1alpha1objectstorage.SchemeBuilder.AddToScheme,
+		v1alpha1sandbox.SchemeBuilder.AddToScheme,
 		v1alpha1namespaced.SchemeBuilder.AddToScheme,
 		v1beta1.SchemeBuilder.AddToScheme,
+		v1alpha1workloadfederation.SchemeBuilder.AddToScheme,
 	)
 }
 

@@ -9,16 +9,44 @@ import (
 
 	"github.com/crossplane/upjet/v2/pkg/controller"
 
-	resource "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/null/resource"
+	cluster "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/cks/cluster"
+	capacityclaim "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/inference/capacityclaim"
+	deployment "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/inference/deployment"
+	gateway "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/inference/gateway"
+	vpc "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/networking/vpc"
+	accesskey "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/objectstorage/accesskey"
+	bucket "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/objectstorage/bucket"
+	bucketinventory "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/objectstorage/bucketinventory"
+	bucketlifecycleconfiguration "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/objectstorage/bucketlifecycleconfiguration"
+	bucketpolicy "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/objectstorage/bucketpolicy"
+	bucketsettings "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/objectstorage/bucketsettings"
+	bucketversioning "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/objectstorage/bucketversioning"
+	organizationaccesspolicy "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/objectstorage/organizationaccesspolicy"
 	providerconfig "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/providerconfig"
+	managedrunner "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/sandbox/managedrunner"
+	oidcconfig "github.com/fabioaraujopt/provider-coreweave/internal/controller/namespaced/workloadfederation/oidcconfig"
 )
 
 // Setup creates all controllers with the supplied logger and adds them to
 // the supplied manager.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
-		resource.Setup,
+		cluster.Setup,
+		capacityclaim.Setup,
+		deployment.Setup,
+		gateway.Setup,
+		vpc.Setup,
+		accesskey.Setup,
+		bucket.Setup,
+		bucketinventory.Setup,
+		bucketlifecycleconfiguration.Setup,
+		bucketpolicy.Setup,
+		bucketsettings.Setup,
+		bucketversioning.Setup,
+		organizationaccesspolicy.Setup,
 		providerconfig.Setup,
+		managedrunner.Setup,
+		oidcconfig.Setup,
 	} {
 		if err := setup(mgr, o); err != nil {
 			return err
@@ -31,8 +59,22 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 // the supplied manager gated.
 func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
-		resource.SetupGated,
+		cluster.SetupGated,
+		capacityclaim.SetupGated,
+		deployment.SetupGated,
+		gateway.SetupGated,
+		vpc.SetupGated,
+		accesskey.SetupGated,
+		bucket.SetupGated,
+		bucketinventory.SetupGated,
+		bucketlifecycleconfiguration.SetupGated,
+		bucketpolicy.SetupGated,
+		bucketsettings.SetupGated,
+		bucketversioning.SetupGated,
+		organizationaccesspolicy.SetupGated,
 		providerconfig.SetupGated,
+		managedrunner.SetupGated,
+		oidcconfig.SetupGated,
 	} {
 		if err := setup(mgr, o); err != nil {
 			return err
@@ -44,8 +86,22 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 // SetupWebhookWithManager registers conversion webhooks for all resource kinds in the group.
 func SetupWebhookWithManager(mgr ctrl.Manager) error {
 	for _, setup := range []func(ctrl.Manager) error{
-		resource.SetupWebhookWithManager,
+		cluster.SetupWebhookWithManager,
+		capacityclaim.SetupWebhookWithManager,
+		deployment.SetupWebhookWithManager,
+		gateway.SetupWebhookWithManager,
+		vpc.SetupWebhookWithManager,
+		accesskey.SetupWebhookWithManager,
+		bucket.SetupWebhookWithManager,
+		bucketinventory.SetupWebhookWithManager,
+		bucketlifecycleconfiguration.SetupWebhookWithManager,
+		bucketpolicy.SetupWebhookWithManager,
+		bucketsettings.SetupWebhookWithManager,
+		bucketversioning.SetupWebhookWithManager,
+		organizationaccesspolicy.SetupWebhookWithManager,
 		providerconfig.SetupWebhookWithManager,
+		managedrunner.SetupWebhookWithManager,
+		oidcconfig.SetupWebhookWithManager,
 	} {
 		if err := setup(mgr); err != nil {
 			return err
