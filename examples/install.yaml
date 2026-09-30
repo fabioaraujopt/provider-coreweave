@@ -3,4 +3,4 @@ kind: Provider
 metadata:
   name: provider-coreweave
 spec:
-  package: xpkg.crossplane.io/fabioaraujopt/provider-coreweave:v0.1.0
+  package: ghcr.io/fabioaraujopt/provider-coreweave:v0.1.0

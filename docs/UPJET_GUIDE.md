@@ -222,7 +222,11 @@ import and delete.
    then `go mod tidy && make generate` at the root.
 3. New resources won't appear until you add them to `ExternalNameConfigs`.
    `config/schema.json` shows what's new.
-4. `make crddiff` in CI flags breaking API changes.
+4. CI's "report breaking changes" job runs `make crddiff`, which flags
+   breaking CRD changes, and `make schema-version-diff`, which lists resources
+   whose Terraform state schema version changed (those may need a state
+   upgrade). `config/generated.lst`, written by the generator, is the list of
+   resources it checks.
 
 ## References
 
