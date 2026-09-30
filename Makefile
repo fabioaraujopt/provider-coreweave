@@ -52,6 +52,15 @@ GO_REQUIRED_VERSION ?= 1.26
 GOLANGCILINT_VERSION ?= 2.13.0
 GO_STATIC_PACKAGES = $(GO_PROJECT)/cmd/provider $(GO_PROJECT)/cmd/generator
 GO_LDFLAGS += -X $(GO_PROJECT)/internal/version.Version=$(VERSION)
+# CoreWeave's generated API clients (the sandbox API) link buf's copy of the
+# gnostic OpenAPI proto annotations, and client-go links
+# github.com/google/gnostic-models. Both register the same proto extension
+# numbers, which panics at init. Downgrade the conflict to a warning: in the
+# provider binary via ldflags, and for `go run` (code generation, `make run`)
+# via the environment.
+# https://protobuf.dev/reference/go/faq#namespace-conflict
+GO_LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn
+export GOLANG_PROTOBUF_REGISTRATION_CONFLICT = warn
 GO_SUBDIRS += cmd internal apis
 -include build/makelib/golang.mk
 

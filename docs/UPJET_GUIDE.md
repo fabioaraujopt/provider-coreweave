@@ -31,13 +31,16 @@ No-fork means the provider's Go code runs inside the Crossplane controller.
 It's the recommended mode: no `terraform` processes, far less memory, faster
 reconciles, and a tiny image. Upbound's AWS/Azure/GCP providers use it.
 
-## 2. Why the Terraform provider is forked
+## 2. Importing the Terraform provider without forking it
 
 `terraform-provider-coreweave` is 100 % Terraform Plugin Framework, which is
 ideal for no-fork. But its provider constructor lives in `internal/provider`,
-and Go forbids importing `internal/` from another module.
+and Go only lets packages under `github.com/coreweave/terraform-provider-coreweave/`
+import it.
 
-The fork (branch `crossplane` on `fabioaraujopt/terraform-provider-coreweave`) adds exactly one file:
+`./xpprovider` is a separate Go module whose path sits under that prefix,
+`github.com/coreweave/terraform-provider-coreweave/xpprovider`, so it may
+import `internal/provider` from the unmodified upstream release:
 
 ```go
 // xpprovider/xpprovider.go
@@ -48,15 +51,36 @@ func New(version string) fwprovider.Provider {
 }
 ```
 
-This is the same pattern Upbound uses (`xpprovider` packages in their AWS and
-Azure forks). `provider-coreweave/go.mod` points at it with:
+`xpprovider/go.mod` requires the upstream release
+(`github.com/coreweave/terraform-provider-coreweave v0.24.0`), and the root
+`go.mod` points at the local module:
 
 ```
-replace github.com/coreweave/terraform-provider-coreweave => github.com/fabioaraujopt/terraform-provider-coreweave v0.0.0-20260929201703-720e39f70417
+replace github.com/coreweave/terraform-provider-coreweave/xpprovider => ./xpprovider
 ```
 
-Worth proposing upstream to CoreWeave: if they accept a public `xpprovider`
-package, the fork goes away.
+This is the same shim Pulumi uses for its CoreWeave provider
+(`pulumi/pulumi-coreweave`, `coreweave-pfshim/`). Upbound's AWS and Azure
+providers do the same job with a fork carrying an `xpprovider` package; the
+shim avoids maintaining a fork. If CoreWeave ever exports a public package,
+the shim can go.
+
+## 2b. Protobuf registration conflict
+
+CoreWeave's generated API clients (the sandbox API) link buf's copy of the
+gnostic OpenAPI annotations, and client-go links
+`github.com/google/gnostic-models`. Both register proto extension 1143, and
+the Go protobuf runtime panics at init:
+
+```
+panic: proto: extension number 1143 is already registered on message google.protobuf.FileOptions
+```
+
+The `Makefile` downgrades this to a warning, in the binary through
+`-X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn`
+and for `go run` (code generation) through
+`GOLANG_PROTOBUF_REGISTRATION_CONFLICT=warn`. If you run the generator or the
+provider outside `make`, set that environment variable yourself.
 
 ## 3. Scaffolding
 
@@ -97,6 +121,11 @@ ujconfig.WithSchemaTraversers(&ujconfig.SingletonListEmbedder{}),
 - `SingletonListEmbedder` renders `MaxItems: 1` blocks as objects instead of
   one-element arrays. It's the default for every new Upjet provider; turning
   it on later is a breaking API change.
+- Upjet must be v2.5.0 or later. Earlier versions marked Plugin Framework
+  single nested blocks with a required child (`BucketVersioning.versioningConfiguration`,
+  `BucketInventory.destination` / `schedule`) as computed, which dropped them
+  from `spec.forProvider`
+  ([crossplane/upjet@5bd3d80](https://github.com/crossplane/upjet/commit/5bd3d807b0f8)).
 
 `internal/clients/coreweave.go` maps the ProviderConfig secret onto the
 Terraform provider block and hands Upjet a fresh framework provider:
@@ -150,19 +179,24 @@ scope, so one copy is enough.
 
 ```bash
 make submodules
-go mod tidy
+go install tool    # goimports, which the Upjet generator shells out to
 make generate      # terraform schema -> scraper -> generator -> controller-gen -> angryjet
 make build
 make run           # out-of-cluster, against the current kubecontext
 make local-deploy  # kind + Crossplane + the provider
 ```
 
+- `$(go env GOPATH)/bin` must be on `PATH` so the generator finds `goimports`.
+- Clone into a path without spaces. Make splits paths on spaces, so a
+  checkout under e.g. `~/Library/Application Support/` fails in the build
+  submodule's tool targets.
+
 Check after `make generate`:
 
-- `package/crds/` has 30 CRDs (15 × 2 scopes) plus the ProviderConfig CRDs.
+- `package/crds/` has 30 CRDs (15 × 2 scopes) plus 5 ProviderConfig CRDs.
 - `examples-generated/` exists; compare with the hand-written `examples/`.
-- Field names in `examples/` match the generated CRDs. The hand-written
-  manifests were written against the schema docs, not generated types.
+- Running `make generate` a second time leaves `git status` clean (CI's
+  `check-diff` job enforces this).
 
 ## 8. Testing against CoreWeave
 
@@ -180,11 +214,12 @@ import and delete.
 
 ## 9. Bumping the CoreWeave provider
 
-1. In the fork: rebase `crossplane` onto the new upstream tag and push it
-   (see `CROSSPLANE_FORK.md`).
-2. Here: point the `replace` line at the new commit with
-   `go mod edit -replace github.com/coreweave/terraform-provider-coreweave=github.com/fabioaraujopt/terraform-provider-coreweave@<commit>`,
-   bump `TERRAFORM_PROVIDER_VERSION`, then `go mod tidy && make generate`.
+1. Bump the shim:
+   `cd xpprovider && go get github.com/coreweave/terraform-provider-coreweave@v<X.Y.Z> && go mod tidy`.
+   If upstream renamed or moved `internal/provider.New`, this is where it
+   fails to compile.
+2. Bump `TERRAFORM_PROVIDER_VERSION` in the `Makefile` to the same version,
+   then `go mod tidy && make generate` at the root.
 3. New resources won't appear until you add them to `ExternalNameConfigs`.
    `config/schema.json` shows what's new.
 4. `make crddiff` in CI flags breaking API changes.
