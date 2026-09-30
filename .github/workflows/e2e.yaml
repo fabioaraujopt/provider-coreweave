@@ -8,6 +8,14 @@ on:
   issue_comment:
     types: [created]
 
+# Commenting `/test-examples="examples/namespaced/objectstorage/v1alpha1/bucket.yaml"`
+# on a PR runs Uptest against CoreWeave. Needs the UPTEST_CLOUD_CREDENTIALS
+# repository secret, e.g. {"token": "CW-SECRET-..."}.
+permissions:
+  contents: read
+  pull-requests: read
+  statuses: write
+
 jobs:
   check-permissions:
     runs-on: ubuntu-latest
