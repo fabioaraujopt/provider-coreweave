@@ -1,0 +1,54 @@
+name: Vulnerability Scan
+
+# Scans the package of the latest release with Grype every Monday and uploads
+# the findings to the repository's Security tab (code scanning).
+
+on:
+  schedule:
+    - cron: '0 5 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: read
+      security-events: write
+    steps:
+      - name: Find the latest release
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=$(gh release view --repo "${GITHUB_REPOSITORY}" --json tagName -q .tagName 2>/dev/null || true)
+          if [ -z "${TAG}" ]; then
+            echo "No release yet, nothing to scan."
+            exit 0
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "sha=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${TAG}" --jq .sha)" >> "$GITHUB_OUTPUT"
+          echo "image=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/provider-coreweave:${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Install Grype
+        if: steps.release.outputs.tag != ''
+        id: grype
+        uses: anchore/scan-action/download-grype@27805bf3b4e84b4a5c980df22ed233c00390a439 # v7.4.2
+
+      - name: Scan the release package
+        if: steps.release.outputs.tag != ''
+        run: |
+          ${{ steps.grype.outputs.cmd }} "${{ steps.release.outputs.image }}" \
+            -o table \
+            -o sarif=grype-results.sarif
+
+      - name: Upload the SARIF report
+        if: steps.release.outputs.tag != ''
+        uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          sarif_file: grype-results.sarif
+          ref: refs/tags/${{ steps.release.outputs.tag }}
+          sha: ${{ steps.release.outputs.sha }}

@@ -2,6 +2,25 @@ apiVersion: meta.pkg.crossplane.io/v1
 kind: Provider
 metadata:
   name: provider-coreweave
+  annotations:
+    meta.crossplane.io/maintainer: Fabio Araujo (https://github.com/fabioaraujopt)
+    meta.crossplane.io/source: github.com/fabioaraujopt/provider-coreweave
+    meta.crossplane.io/license: Apache-2.0
+    friendly-name.meta.crossplane.io: Provider CoreWeave
+    meta.crossplane.io/description: |
+      Crossplane provider for CoreWeave: CKS clusters, VPCs, AI Object
+      Storage, inference, sandbox runners and workload identity federation.
+    meta.crossplane.io/readme: |
+      `provider-coreweave` manages CoreWeave infrastructure as Kubernetes
+      resources. It is generated with Upjet from CoreWeave's official
+      Terraform provider (coreweave/coreweave) and runs it in-process.
+
+      Every kind ships namespaced (`*.coreweave.m.crossplane.io`) and
+      cluster-scoped (`*.coreweave.crossplane.io`). Configure credentials
+      with a `ClusterProviderConfig` or `ProviderConfig` that points at a
+      Secret holding `{"token": "CW-SECRET-..."}`.
+
+      Documentation and examples: https://github.com/fabioaraujopt/provider-coreweave
 spec:
   capabilities:
     - SafeStart

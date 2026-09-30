@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/fabioaraujopt/provider-coreweave/security/advisories/new
+    about: Please report security issues privately, not as public issues.
+  - name: Crossplane Slack
+    url: https://slack.crossplane.io
+    about: Questions about Crossplane and Upjet in general.
